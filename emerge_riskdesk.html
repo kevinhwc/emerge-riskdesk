@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emerge RiskDesk — Underwriter Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--ep:#942255;--ed:#36082D;--cream:#F5EFE8;--ff:'DM Sans',-apple-system,sans-serif;--ffd:'Playfair Display',Georgia,serif;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--ff);background:#f4f0ea;min-height:100vh;}
+
+/* ── TOP NAV ── */
+.topnav{background:var(--ed);padding:0 32px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.tn-logo{display:flex;align-items:center;gap:9px;}
+.tn-sq{width:24px;height:24px;background:var(--ep);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;}
+.tn-brand{font-size:13px;font-weight:600;color:white;letter-spacing:1.5px;}
+.tn-pill{background:rgba(148,34,85,0.3);border:0.5px solid rgba(148,34,85,0.5);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;color:rgba(255,200,220,0.9);margin-left:10px;}
+.tn-tabs{display:flex;gap:2px;}
+.tt{padding:6px 14px;border-radius:5px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.1s;border:none;background:transparent;}
+.tt:hover{color:rgba(255,255,255,0.8);}
+.tt.act{background:rgba(148,34,85,0.25);color:white;}
+.tn-right{display:flex;align-items:center;gap:10px;}
+.tn-uw{display:flex;align-items:center;gap:7px;}
+.tn-av{width:26px;height:26px;border-radius:50%;background:var(--ep);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;}
+.tn-name{font-size:12px;color:rgba(255,255,255,0.6);}
+.tn-badge{background:rgba(148,34,85,0.4);color:#ffb8d1;font-size:11px;font-weight:600;border-radius:10px;padding:1px 7px;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;height:calc(100vh - 52px);}
+.sidebar{width:240px;min-width:240px;background:white;border-right:0.5px solid #e0dbd4;display:flex;flex-direction:column;overflow-y:auto;}
+.main{flex:1;overflow-y:auto;background:#f4f0ea;}
+.scr{display:none;padding:24px;}
+.scr.act{display:block;}
+
+/* ── SIDEBAR ── */
+.sb-sec{font-size:10px;font-weight:600;color:#aaa;letter-spacing:1px;text-transform:uppercase;padding:16px 18px 6px;}
+.sni{display:flex;align-items:center;gap:8px;padding:8px 18px;font-size:12px;color:#666;cursor:pointer;border-left:2px solid transparent;transition:all 0.1s;}
+.sni:hover{background:#faf8f5;color:#333;}
+.sni.act{background:#fdf5f8;color:var(--ep);border-left-color:var(--ep);font-weight:500;}
+.sni svg{width:14px;height:14px;flex-shrink:0;}
+.snb{margin-left:auto;background:rgba(148,34,85,0.12);color:var(--ep);font-size:10px;font-weight:700;border-radius:10px;padding:1px 7px;}
+.sb-stats{padding:16px 18px;border-top:0.5px solid #ece7e0;margin-top:auto;}
+.sbs-t{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;font-weight:600;}
+.sbs-row{display:flex;justify-content:space-between;margin-bottom:8px;}
+.sbs-l{font-size:12px;color:#888;}
+.sbs-v{font-size:12px;font-weight:600;color:#1a1a1a;}
+
+/* ── SHARED ── */
+.pg-hd{margin-bottom:20px;}
+.pg-t{font-size:18px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
+.pg-s{font-size:12px;color:#888;}
+.card{background:white;border:0.5px solid #e0dbd4;border-radius:10px;overflow:hidden;margin-bottom:14px;}
+.card-hd{padding:12px 16px;border-bottom:0.5px solid #e8e3dc;display:flex;justify-content:space-between;align-items:center;}
+.card-t{font-size:12px;font-weight:600;color:#1a1a1a;}
+.card-sub{font-size:11px;color:#888;}
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{text-align:left;padding:9px 14px;font-size:11px;color:#888;font-weight:500;border-bottom:0.5px solid #e8e3dc;text-transform:uppercase;letter-spacing:0.3px;background:#faf8f5;white-space:nowrap;}
+.tbl td{padding:10px 14px;border-bottom:0.5px solid #ece7e0;color:#1a1a1a;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:#fdf9f7;cursor:pointer;}
+.td-m{color:#888;}
+.td-mono{font-family:monospace;font-size:11px;color:#999;}
+.td-act{color:var(--ep);font-weight:500;cursor:pointer;font-size:11px;}
+.bdg{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.bdg-g{background:#eaf3de;color:#3B6D11;}
+.bdg-a{background:#faeeda;color:#854F0B;}
+.bdg-r{background:#fcebeb;color:#A32D2D;}
+.bdg-b{background:#e6f1fb;color:#185FA5;}
+.bdg-p{background:rgba(148,34,85,0.1);color:var(--ep);}
+.bdg-dark{background:var(--ed);color:rgba(255,255,255,0.8);}
+.grid-2{display:grid;gap:14px;}
+.g2-7{grid-template-columns:1fr 300px;}
+.g2-6{grid-template-columns:1fr 260px;}
+.g2-5{grid-template-columns:3fr 2fr;}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.sc{background:white;border:0.5px solid #e0dbd4;border-radius:10px;padding:14px;}
+.sc.em{background:var(--ep);border-color:var(--ep);}
+.sc-lbl{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px;}
+.sc.em .sc-lbl{color:rgba(255,255,255,0.6);}
+.sc-val{font-size:24px;font-weight:700;color:#1a1a1a;line-height:1;margin-bottom:4px;}
+.sc.em .sc-val{color:white;}
+.sc-sub{font-size:11px;color:#888;}
+.sc.em .sc-sub{color:rgba(255,255,255,0.55);}
+.btn-p{background:var(--ep);color:white;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ff);}
+.btn-s{background:transparent;color:#333;border:0.5px solid #ccc;border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:var(--ff);}
+.btn-d{background:var(--ed);color:white;border:none;border-radius:6px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--ff);}
+.row-item{display:flex;align-items:center;gap:11px;padding:11px 16px;border-bottom:0.5px solid #ece7e0;}
+.row-item:last-child{border-bottom:none;}
+.kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid #f0ebe4;font-size:12px;}
+.kv:last-child{border-bottom:none;}
+.kv-k{color:#888;}
+.kv-v{font-weight:500;color:#1a1a1a;text-align:right;}
+.alert-a{background:#faeeda;border-radius:8px;padding:11px 14px;border-left:3px solid #854F0B;margin-bottom:12px;}
+.alert-b{background:#e6f1fb;border-radius:8px;padding:11px 14px;border-left:3px solid #185FA5;margin-bottom:12px;}
+.alert-t{font-size:12px;font-weight:600;margin-bottom:3px;}
+.alert-a .alert-t{color:#854F0B;}
+.alert-b .alert-t{color:#185FA5;}
+.alert-d{font-size:11px;line-height:1.55;color:#5a4a2a;}
+.alert-b .alert-d{color:#1a3d6a;}
+.section-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.section-t{font-size:12px;font-weight:600;color:#333;text-transform:uppercase;letter-spacing:0.5px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:7px;}
+.tag{background:#f4f0ea;border:0.5px solid #d8d2cc;border-radius:20px;padding:4px 12px;font-size:11px;color:#555;}
+.tag.ep{background:rgba(148,34,85,0.08);border-color:rgba(148,34,85,0.2);color:var(--ep);}
+.progress-bar{height:6px;background:#f0ebe4;border-radius:3px;overflow:hidden;margin-top:5px;}
+.pb-fill{height:100%;border-radius:3px;background:var(--ep);}
+
+/* ── HERO BANNER ── */
+.hero-banner{background:var(--ed);padding:32px 24px;border-radius:12px;margin-bottom:20px;position:relative;overflow:hidden;}
+.hb-bg{position:absolute;inset:0;background:
+  repeating-linear-gradient(135deg,transparent,transparent 30px,rgba(148,34,85,0.06) 30px,rgba(148,34,85,0.06) 31px);pointer-events:none;}
+.hb-eyebrow{font-size:11px;font-weight:600;color:rgba(148,34,85,0.8);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;position:relative;}
+.hb-h1{font-family:var(--ffd);font-size:32px;font-weight:900;color:white;line-height:1.1;margin-bottom:8px;position:relative;}
+.hb-h1 em{color:var(--ep);font-style:normal;}
+.hb-sub{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6;max-width:480px;position:relative;font-weight:300;}
+.hb-stats{display:flex;gap:32px;margin-top:22px;position:relative;}
+.hbs{text-align:left;}
+.hbs-v{font-family:var(--ffd);font-size:28px;font-weight:700;color:white;line-height:1;}
+.hbs-l{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;}
+
+/* ── RISK CARD ── */
+.risk-card{background:white;border:0.5px solid #e0dbd4;border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer;transition:all 0.15s;position:relative;}
+.risk-card:hover{border-color:rgba(148,34,85,0.3);box-shadow:0 2px 12px rgba(148,34,85,0.08);}
+.risk-card.urgent{border-left:3px solid #A32D2D;}
+.risk-card.pending{border-left:3px solid #854F0B;}
+.rc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.rc-ref{font-size:11px;font-family:monospace;color:#aaa;margin-bottom:3px;}
+.rc-name{font-size:13px;font-weight:600;color:#1a1a1a;}
+.rc-class{font-size:11px;color:#888;margin-top:2px;}
+.rc-meta{display:flex;gap:20px;padding-top:10px;border-top:0.5px solid #f0ebe4;}
+.rcm{flex:1;}
+.rcm-l{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px;}
+.rcm-v{font-size:12px;font-weight:500;color:#1a1a1a;}
+.rc-actions{position:absolute;top:14px;right:14px;display:flex;gap:6px;}
+
+/* ── RISK DETAIL ── */
+.detail-hd{background:var(--ed);border-radius:10px;padding:20px 22px;margin-bottom:14px;position:relative;overflow:hidden;}
+.dhd-bg{position:absolute;inset:0;background:repeating-linear-gradient(135deg,transparent,transparent 20px,rgba(148,34,85,0.05) 20px,rgba(148,34,85,0.05) 21px);pointer-events:none;}
+.dhd-ref{font-size:11px;font-family:monospace;color:rgba(255,255,255,0.35);margin-bottom:6px;position:relative;}
+.dhd-name{font-family:var(--ffd);font-size:22px;font-weight:700;color:white;margin-bottom:4px;position:relative;}
+.dhd-class{font-size:12px;color:rgba(255,255,255,0.45);position:relative;margin-bottom:14px;}
+.dhd-tags{display:flex;gap:8px;flex-wrap:wrap;position:relative;}
+.dhd-tag{background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.14);border-radius:20px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.6);}
+.dhd-tag.ep{background:rgba(148,34,85,0.3);border-color:rgba(148,34,85,0.5);color:#ffb8d1;}
+
+/* ── QUOTE BUILDER ── */
+.qb-row{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:0.5px solid #ece7e0;}
+.qb-row:last-child{border-bottom:none;}
+.qb-label{font-size:12px;font-weight:500;color:#1a1a1a;}
+.qb-sub{font-size:11px;color:#888;margin-top:1px;}
+.qb-input{border:0.5px solid #d0cac3;border-radius:6px;padding:5px 10px;font-size:12px;color:#1a1a1a;font-family:var(--ff);width:140px;text-align:right;}
+.qb-total{background:#fdf5f8;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;}
+.qbt-l{font-size:12px;font-weight:600;color:#1a1a1a;}
+.qbt-v{font-size:18px;font-weight:700;color:var(--ep);font-family:var(--ffd);}
+
+/* ── MARKET PANEL ── */
+.mkt-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:0.5px solid #ece7e0;}
+.mkt-row:last-child{border-bottom:none;}
+.mkt-logo{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.ml-mre{background:#e6f1fb;color:#185FA5;}
+.ml-sre{background:#eaf3de;color:#3B6D11;}
+.ml-han{background:#faeeda;color:#854F0B;}
+.ml-axi{background:#fcebeb;color:#A32D2D;}
+.ml-qbe{background:rgba(148,34,85,0.1);color:var(--ep);}
+.mkt-info{flex:1;}
+.mkt-name{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}
+.mkt-cap{font-size:11px;color:#888;}
+.mkt-share{width:50px;text-align:right;}
+.mkt-share-v{font-size:13px;font-weight:600;color:#1a1a1a;}
+.mkt-share-l{font-size:10px;color:#aaa;}
+
+/* ── DOCUMENT ROW ── */
+.doc-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:0.5px solid #ece7e0;}
+.doc-row:last-child{border-bottom:none;}
+.doc-ic{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.di-pdf{background:#fcebeb;color:#A32D2D;}
+.di-xls{background:#eaf3de;color:#3B6D11;}
+.di-doc{background:#e6f1fb;color:#185FA5;}
+.doc-name{font-size:12px;font-weight:500;color:#1a1a1a;margin-bottom:1px;}
+.doc-meta{font-size:11px;color:#aaa;}
+
+/* ── TIMELINE ── */
+.tl-item{display:flex;gap:12px;padding:8px 0;}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;}
+.tl-dot-f{background:var(--ep);}
+.tl-dot-e{background:#e0dbd4;border:1.5px solid #ccc;}
+.tl-date{font-size:11px;color:#aaa;width:80px;flex-shrink:0;}
+.tl-desc{font-size:12px;color:#333;}
+.tl-sub{font-size:11px;color:#aaa;margin-top:1px;}
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAV ── -->
+<div class="topnav">
+  <div class="tn-logo">
+    <div class="tn-sq">E</div>
+    <span class="tn-brand">EMERGE</span>
+    <span class="tn-pill">RISKDESK</span>
+  </div>
+  <div class="tn-tabs">
+    <div class="tt act" onclick="go('inbox')">Inbox</div>
+    <div class="tt" onclick="go('submissions')">Submissions</div>
+    <div class="tt" onclick="go('detail')">Risk Detail</div>
+    <div class="tt" onclick="go('quote')">Quote Builder</div>
+    <div class="tt" onclick="go('market')">Market Panel</div>
+  </div>
+  <div class="tn-right">
+    <div class="tn-uw">
+      <div class="tn-av">KL</div>
+      <span class="tn-name">Emerge Brokers</span>
+    </div>
+    <span class="tn-badge">5 pending</span>
+  </div>
+</div>
+
+<div class="layout">
+
+<!-- ── SIDEBAR ── -->
+<div class="sidebar">
+  <div class="sb-sec">Submissions</div>
+  <div class="sni act" onclick="go('inbox',this)"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 8h3l1.5 3h3L10 8h3" stroke="currentColor" stroke-width="1.1" fill="none"/></svg>Inbox <span class="snb">5</span></div>
+  <div class="sni" onclick="go('submissions',this)"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><line x1="4" y1="5" x2="10" y2="5" stroke="currentColor" stroke-width="1"/><line x1="4" y1="8" x2="8" y2="8" stroke="currentColor" stroke-width="1"/></svg>All Submissions</div>
+  <div class="sni" onclick="go('detail',this)"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><line x1="7" y1="5" x2="7" y2="7.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="9.5" r=".6" fill="currentColor"/></svg>Risk Detail</div>
+  <div class="sni" onclick="go('quote',this)"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="6" x2="13" y2="6" stroke="currentColor" stroke-width="1"/><line x1="4" y1="9" x2="6" y2="9" stroke="currentColor" stroke-width="1.3"/></svg>Quote Builder</div>
+  <div class="sni" onclick="go('market',this)"><svg viewBox="0 0 14 14" fill="none"><polyline points="1,11 4,7 7,9 10,4 13,6" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>Market Panel</div>
+  <div class="sb-sec">Tools</div>
+  <div class="sni"><svg viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7L6.5 9L9.5 5" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>Coverage Checker</div>
+  <div class="sni"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="6" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M10 10L13 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>AI Risk Summary</div>
+  <div class="sni"><svg viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2"/><line x1="4.5" y1="5" x2="9.5" y2="5" stroke="currentColor" stroke-width="1"/><line x1="4.5" y1="7.5" x2="9.5" y2="7.5" stroke="currentColor" stroke-width="1"/></svg>Wordings Library</div>
+  <div class="sb-stats">
+    <div class="sbs-t">This Month</div>
+    <div class="sbs-row"><span class="sbs-l">Submissions</span><span class="sbs-v">12</span></div>
+    <div class="sbs-row"><span class="sbs-l">Quoted</span><span class="sbs-v">8</span></div>
+    <div class="sbs-row"><span class="sbs-l">Bound</span><span class="sbs-v">5</span></div>
+    <div class="sbs-row"><span class="sbs-l">Bound Premium</span><span class="sbs-v">MYR 2.1M</span></div>
+  </div>
+</div>
+
+<!-- ═══ SCREENS ═══ -->
+<div class="main">
+
+<!-- ── INBOX ── -->
+<div class="scr act" id="s-inbox">
+  <div class="pg-hd">
+    <div class="pg-t">Risk Inbox</div>
+    <div class="pg-s">New submissions from Emerge Insurance Brokers requiring your review</div>
+  </div>
+
+  <div class="hero-banner">
+    <div class="hb-bg"></div>
+    <div class="hb-eyebrow">Emerge RiskDesk</div>
+    <div class="hb-h1">The Future of Risk is <em>Emerging</em></div>
+    <div class="hb-sub">Structured risk submissions, AI-enriched with loss data, financial statements and coverage benchmarks — ready for your underwriting decision.</div>
+    <div class="hb-stats">
+      <div class="hbs"><div class="hbs-v">5</div><div class="hbs-l">Awaiting review</div></div>
+      <div class="hbs"><div class="hbs-v">MYR 4.8M</div><div class="hbs-l">Indicative premium pool</div></div>
+      <div class="hbs"><div class="hbs-v">3</div><div class="hbs-l">Expiring this week</div></div>
+    </div>
+  </div>
+
+  <div class="alert-a"><div class="alert-t">3 submissions require response by Friday, 18 Apr</div><div class="alert-d">Bukit Selambau LSS5 Solar, AMBC Transmission Performance Bond, and Faradisse High JPS Contract are all deadline-sensitive. Emerge team has flagged these as priority.</div></div>
+
+  <div class="risk-card urgent" onclick="go('detail')">
+    <div class="rc-actions"><span class="bdg bdg-r">Urgent</span></div>
+    <div class="rc-ref">SUB-2026-0441</div>
+    <div class="rc-name">Bukit Selambau LSS5 Solar Project — EAR/CAR</div>
+    <div class="rc-class">Engineering All Risks · Kedah, Malaysia</div>
+    <div class="rc-meta">
+      <div class="rcm"><div class="rcm-l">Contract Value</div><div class="rcm-v">MYR ~1,000,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">EML</div><div class="rcm-v">MYR 320,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">Lead Underwriter</div><div class="rcm-v">Requested: 40%</div></div>
+      <div class="rcm"><div class="rcm-l">Submission Date</div><div class="rcm-v">14 Apr 2026</div></div>
+      <div class="rcm"><div class="rcm-l">Respond By</div><div class="rcm-v" style="color:#A32D2D;font-weight:600;">18 Apr 2026</div></div>
+    </div>
+  </div>
+
+  <div class="risk-card pending" onclick="go('detail')">
+    <div class="rc-actions"><span class="bdg bdg-a">Review</span></div>
+    <div class="rc-ref">SUB-2026-0438</div>
+    <div class="rc-name">AMBC Transmission Sdn Bhd — Performance Bond</div>
+    <div class="rc-class">Surety · Performance Bond · Singapore Law / SIAC</div>
+    <div class="rc-meta">
+      <div class="rcm"><div class="rcm-l">Bond Amount</div><div class="rcm-v">MYR 22,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">Bond Type</div><div class="rcm-v">Performance — PDG</div></div>
+      <div class="rcm"><div class="rcm-l">Obligee</div><div class="rcm-v">Tenaga Nasional</div></div>
+      <div class="rcm"><div class="rcm-l">Submission Date</div><div class="rcm-v">12 Apr 2026</div></div>
+      <div class="rcm"><div class="rcm-l">Respond By</div><div class="rcm-v" style="color:#854F0B;">18 Apr 2026</div></div>
+    </div>
+  </div>
+
+  <div class="risk-card" onclick="go('detail')">
+    <div class="rc-actions"><span class="bdg bdg-b">New</span></div>
+    <div class="rc-ref">SUB-2026-0435</div>
+    <div class="rc-name">Faradisse High Sdn Bhd — Advance Payment Bond</div>
+    <div class="rc-class">Surety · Advance Payment Bond · JPS Federal Contract</div>
+    <div class="rc-meta">
+      <div class="rcm"><div class="rcm-l">Bond Amount</div><div class="rcm-v">MYR 62,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">Bond Type</div><div class="rcm-v">Advance Payment</div></div>
+      <div class="rcm"><div class="rcm-l">Obligee</div><div class="rcm-v">JKR Malaysia</div></div>
+      <div class="rcm"><div class="rcm-l">Submission Date</div><div class="rcm-v">10 Apr 2026</div></div>
+      <div class="rcm"><div class="rcm-l">Respond By</div><div class="rcm-v">22 Apr 2026</div></div>
+    </div>
+  </div>
+
+  <div class="risk-card" onclick="go('detail')">
+    <div class="rc-actions"><span class="bdg bdg-b">New</span></div>
+    <div class="rc-ref">SUB-2026-0431</div>
+    <div class="rc-name">IB-VOGT Solar SPV — CMI Operational Phase</div>
+    <div class="rc-class">Construction &amp; Machinery Insurance · Kedah, Malaysia</div>
+    <div class="rc-meta">
+      <div class="rcm"><div class="rcm-l">Installed Capacity</div><div class="rcm-v">500 MWac</div></div>
+      <div class="rcm"><div class="rcm-l">Sum Insured</div><div class="rcm-v">MYR 2,400,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">Line Requested</div><div class="rcm-v">20%</div></div>
+      <div class="rcm"><div class="rcm-l">Submission Date</div><div class="rcm-v">8 Apr 2026</div></div>
+      <div class="rcm"><div class="rcm-l">Respond By</div><div class="rcm-v">25 Apr 2026</div></div>
+    </div>
+  </div>
+
+  <div class="risk-card" onclick="go('detail')">
+    <div class="rc-actions"><span class="bdg bdg-p">Info Reqd</span></div>
+    <div class="rc-ref">SUB-2026-0428</div>
+    <div class="rc-name">Muara Atur Sdn Bhd — Advance Payment Bond</div>
+    <div class="rc-class">Surety · JKR Federal Road Project</div>
+    <div class="rc-meta">
+      <div class="rcm"><div class="rcm-l">Bond Amount</div><div class="rcm-v">MYR 10,000,000</div></div>
+      <div class="rcm"><div class="rcm-l">Bond Type</div><div class="rcm-v">Advance Payment</div></div>
+      <div class="rcm"><div class="rcm-l">Obligee</div><div class="rcm-v">JKR Persekutuan</div></div>
+      <div class="rcm"><div class="rcm-l">Submission Date</div><div class="rcm-v">5 Apr 2026</div></div>
+      <div class="rcm"><div class="rcm-l">Status</div><div class="rcm-v" style="color:var(--ep);">Awaiting financials</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── ALL SUBMISSIONS ── -->
+<div class="scr" id="s-submissions">
+  <div class="pg-hd"><div class="pg-t">All Submissions</div><div class="pg-s">Complete submission history from Emerge Insurance Brokers</div></div>
+  <div class="grid-4">
+    <div class="sc em"><div class="sc-lbl">Total (YTD)</div><div class="sc-val">47</div><div class="sc-sub">Submissions received</div></div>
+    <div class="sc"><div class="sc-lbl">Quoted</div><div class="sc-val">32</div><div class="sc-sub">68% quote rate</div></div>
+    <div class="sc"><div class="sc-lbl">Bound</div><div class="sc-val">21</div><div class="sc-sub">MYR 8.4M premium</div></div>
+    <div class="sc"><div class="sc-lbl">Avg Response</div><div class="sc-val">2.4d</div><div class="sc-sub">Days to quote</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-t">Submission Log</div><div style="display:flex;gap:7px;"><button class="btn-s">Filter</button><button class="btn-s">Export</button></div></div>
+    <div style="overflow-x:auto;">
+    <table class="tbl">
+      <thead><tr><th>Ref</th><th>Risk Name</th><th>Class</th><th>Sum Insured / Bond</th><th>Indicative Premium</th><th>Submitted</th><th>Respond By</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr onclick="go('detail')"><td class="td-mono">SUB-2026-0441</td><td style="font-weight:500;">Bukit Selambau LSS5 Solar</td><td class="td-m">EAR/CAR</td><td>MYR 1B contract</td><td style="font-weight:500;color:var(--ep);">MYR 1,840,000</td><td class="td-m">14 Apr</td><td style="color:#A32D2D;font-weight:500;">18 Apr</td><td><span class="bdg bdg-r">Urgent</span></td><td class="td-act">Review →</td></tr>
+        <tr onclick="go('detail')"><td class="td-mono">SUB-2026-0438</td><td style="font-weight:500;">AMBC Transmission — Perf Bond</td><td class="td-m">Surety</td><td>MYR 22,000,000</td><td style="font-weight:500;color:var(--ep);">MYR 110,000</td><td class="td-m">12 Apr</td><td style="color:#854F0B;font-weight:500;">18 Apr</td><td><span class="bdg bdg-a">Review</span></td><td class="td-act">Review →</td></tr>
+        <tr onclick="go('detail')"><td class="td-mono">SUB-2026-0435</td><td style="font-weight:500;">Faradisse High — APB</td><td class="td-m">Surety</td><td>MYR 62,000,000</td><td style="font-weight:500;color:var(--ep);">MYR 186,000</td><td class="td-m">10 Apr</td><td class="td-m">22 Apr</td><td><span class="bdg bdg-b">New</span></td><td class="td-act">Review →</td></tr>
+        <tr onclick="go('detail')"><td class="td-mono">SUB-2026-0431</td><td style="font-weight:500;">IB-VOGT Solar — CMI Ops</td><td class="td-m">Engineering</td><td>MYR 2,400,000,000</td><td style="font-weight:500;color:var(--ep);">MYR 2,160,000</td><td class="td-m">8 Apr</td><td class="td-m">25 Apr</td><td><span class="bdg bdg-b">New</span></td><td class="td-act">Review →</td></tr>
+        <tr onclick="go('detail')"><td class="td-mono">SUB-2026-0428</td><td style="font-weight:500;">Muara Atur — APB JKR</td><td class="td-m">Surety</td><td>MYR 10,000,000</td><td style="font-weight:500;color:var(--ep);">MYR 50,000</td><td class="td-m">5 Apr</td><td class="td-m">24 Apr</td><td><span class="bdg bdg-p">Info Reqd</span></td><td class="td-act">Review →</td></tr>
+        <tr><td class="td-mono">SUB-2026-0418</td><td style="font-weight:500;">Petron Miles GPA Scheme</td><td class="td-m">GPA</td><td>1M cardholders</td><td style="font-weight:500;color:var(--ep);">MYR 3,200,000</td><td class="td-m">28 Mar</td><td class="td-m">—</td><td><span class="bdg bdg-g">Quoted</span></td><td class="td-act">View →</td></tr>
+        <tr><td class="td-mono">SUB-2026-0401</td><td style="font-weight:500;">Solarvest Atlantic Blue EAR</td><td class="td-m">EAR</td><td>MYR 420,000,000</td><td style="font-weight:500;color:var(--ep);">MYR 756,000</td><td class="td-m">14 Mar</td><td class="td-m">—</td><td><span class="bdg bdg-dark">Bound</span></td><td class="td-act">View →</td></tr>
+        <tr><td class="td-mono">SUB-2026-0388</td><td style="font-weight:500;">Equentia Natural Resources — CMI</td><td class="td-m">Marine Cargo</td><td>Open cover</td><td style="font-weight:500;color:var(--ep);">MYR 480,000</td><td class="td-m">2 Mar</td><td class="td-m">—</td><td><span class="bdg bdg-dark">Bound</span></td><td class="td-act">View →</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── RISK DETAIL ── -->
+<div class="scr" id="s-detail">
+  <div class="pg-hd"><div class="pg-t">Risk Submission Detail</div><div class="pg-s">Prepared by Emerge Insurance Brokers · SUB-2026-0441</div></div>
+  <div class="detail-hd">
+    <div class="dhd-bg"></div>
+    <div class="dhd-ref">SUB-2026-0441 · Submitted 14 April 2026</div>
+    <div class="dhd-name">Bukit Selambau LSS5 Solar Project</div>
+    <div class="dhd-class">Engineering All Risks (EAR) / Contractors All Risk (CAR) · Kedah, Malaysia</div>
+    <div class="dhd-tags">
+      <span class="dhd-tag ep">Priority Submission</span>
+      <span class="dhd-tag">Respond by 18 Apr 2026</span>
+      <span class="dhd-tag">Lead line requested</span>
+      <span class="dhd-tag">Solarvest / Atlantic Blue JV</span>
+      <span class="dhd-tag">~1,000 MWp</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;">
+    <button class="btn-p" onclick="go('quote')">Prepare Quote →</button>
+    <button class="btn-d">Request Clarification</button>
+    <button class="btn-s">Decline</button>
+    <button class="btn-s">Share with Co-underwriter</button>
+  </div>
+
+  <div class="grid-2 g2-7">
+    <div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Risk Summary</div><span class="bdg bdg-b">AI-enriched</span></div>
+        <div style="padding:14px 16px;border-bottom:0.5px solid #e8e3dc;">
+          <div class="kv"><span class="kv-k">Insured</span><span class="kv-v">Solarvest Holdings Bhd / Atlantic Blue Sdn Bhd JV</span></div>
+          <div class="kv"><span class="kv-k">Project Location</span><span class="kv-v">Bukit Selambau, Kedah, Malaysia</span></div>
+          <div class="kv"><span class="kv-k">Contract Value</span><span class="kv-v">MYR ~1,000,000,000</span></div>
+          <div class="kv"><span class="kv-k">Installed Capacity</span><span class="kv-v">~1,000 MWp (DC) / 500 MWac</span></div>
+          <div class="kv"><span class="kv-k">Project Type</span><span class="kv-v">LSS5 Large Scale Solar · Grid-connected</span></div>
+          <div class="kv"><span class="kv-k">EPCC Contractor</span><span class="kv-v">Atlantic Blue Sdn Bhd</span></div>
+          <div class="kv"><span class="kv-k">Construction Period</span><span class="kv-v">30 months (Apr 2026 – Oct 2028)</span></div>
+          <div class="kv"><span class="kv-k">Maintenance Period</span><span class="kv-v">12 months post-completion</span></div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:0.5px solid #e8e3dc;">
+          <div class="kv"><span class="kv-k">Sum Insured (Section I — MD)</span><span class="kv-v">MYR 1,000,000,000</span></div>
+          <div class="kv"><span class="kv-k">Sum Insured (Section II — TPL)</span><span class="kv-v">MYR 50,000,000 any one event</span></div>
+          <div class="kv"><span class="kv-k">EML (Estimated Max Loss)</span><span class="kv-v">MYR 320,000,000</span></div>
+          <div class="kv"><span class="kv-k">Line Requested</span><span class="kv-v">Lead — 40%</span></div>
+          <div class="kv"><span class="kv-k">Indicative Premium (100%)</span><span class="kv-v" style="color:var(--ep);font-weight:600;">MYR 1,840,000</span></div>
+          <div class="kv"><span class="kv-k">Minimum &amp; Deposit Premium</span><span class="kv-v">75% of annual</span></div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;">AI Risk Assessment</div>
+          <div style="font-size:12px;color:#444;line-height:1.7;margin-bottom:10px;">This is a well-structured LSS5 submission. The EML of 32% of SI is reasonable for a ground-mounted solar project of this scale. Flood exposure at Bukit Selambau is moderate — NAHRIM flood zone mapping shows 1-in-50 year inundation risk at 0.4m. Recommend confirming plinth height and drainage design before binding.</div>
+          <div class="tag-row">
+            <span class="tag ep">Solar — LSS5</span>
+            <span class="tag">Flood zone: Moderate</span>
+            <span class="tag">EPCC contractor: Known</span>
+            <span class="tag">JV structure</span>
+            <span class="tag">TNB offtake</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Submission Documents</div></div>
+        <div class="doc-row"><div class="doc-ic di-pdf">PDF</div><div style="flex:1;"><div class="doc-name">Risk Submission Summary — LSS5 Bukit Selambau</div><div class="doc-meta">Emerge Insurance · 14 Apr 2026 · 2.1 MB</div></div><div class="td-act">View</div></div>
+        <div class="doc-row"><div class="doc-ic di-pdf">PDF</div><div style="flex:1;"><div class="doc-name">Project Technical Specification</div><div class="doc-meta">Atlantic Blue Engineering · 48 pages · 8.4 MB</div></div><div class="td-act">View</div></div>
+        <div class="doc-row"><div class="doc-ic di-xls">XLS</div><div style="flex:1;"><div class="doc-name">Construction Schedule &amp; Milestones</div><div class="doc-meta">Solarvest / Atlantic Blue · Apr 2026</div></div><div class="td-act">View</div></div>
+        <div class="doc-row"><div class="doc-ic di-pdf">PDF</div><div style="flex:1;"><div class="doc-name">Audited Financials — Solarvest FY2024</div><div class="doc-meta">Bursa-listed · Revenue MYR 312M</div></div><div class="td-act">View</div></div>
+        <div class="doc-row"><div class="doc-ic di-pdf">PDF</div><div style="flex:1;"><div class="doc-name">NAHRIM Flood Risk Assessment</div><div class="doc-meta">Kedah site — 1:50 year flood mapping</div></div><div class="td-act">View</div></div>
+        <div class="doc-row"><div class="doc-ic di-doc">DOC</div><div style="flex:1;"><div class="doc-name">Proposed Policy Wording — Munich Re EAR v2.1</div><div class="doc-meta">Emerge · Draft for review</div></div><div class="td-act">View</div></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Submission Timeline</div></div>
+        <div style="padding:12px 16px;">
+          <div class="tl-item"><div class="tl-dot tl-dot-f"></div><div><div class="tl-date">14 Apr 2026</div><div class="tl-desc">Submission received</div><div class="tl-sub">Full documentation package</div></div></div>
+          <div class="tl-item"><div class="tl-dot tl-dot-f"></div><div><div class="tl-date">14 Apr 2026</div><div class="tl-desc">AI risk summary generated</div><div class="tl-sub">Flood mapping, financials indexed</div></div></div>
+          <div class="tl-item"><div class="tl-dot tl-dot-e"></div><div><div class="tl-date">Pending</div><div class="tl-desc" style="color:#aaa;">Underwriter review</div></div></div>
+          <div class="tl-item"><div class="tl-dot tl-dot-e"></div><div><div class="tl-date">By 18 Apr</div><div class="tl-desc" style="color:#aaa;">Quote / decline required</div></div></div>
+          <div class="tl-item"><div class="tl-dot tl-dot-e"></div><div><div class="tl-date">TBC</div><div class="tl-desc" style="color:#aaa;">Bind / issue policy</div></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Key Underwriting Flags</div></div>
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:9px;">
+          <div style="background:#faeeda;border-radius:7px;padding:10px 12px;border-left:3px solid #854F0B;"><div style="font-size:12px;font-weight:600;color:#854F0B;margin-bottom:3px;">Confirm flood plinth height</div><div style="font-size:11px;color:#6b5a30;line-height:1.5;">Site elevation data requested. NAHRIM shows moderate inundation risk. Confirm minimum 0.6m above 1:100 year flood level.</div></div>
+          <div style="background:#e6f1fb;border-radius:7px;padding:10px 12px;border-left:3px solid #185FA5;"><div style="font-size:12px;font-weight:600;color:#185FA5;margin-bottom:3px;">JV structure — verify insurable interest</div><div style="font-size:11px;color:#1a3d6a;line-height:1.5;">Solarvest / Atlantic Blue JV. Confirm both entities named as co-insureds and EPCC obligations clearly delineated.</div></div>
+          <div style="background:#eaf3de;border-radius:7px;padding:10px 12px;border-left:3px solid #3B6D11;"><div style="font-size:12px;font-weight:600;color:#3B6D11;margin-bottom:3px;">TNB offtake agreement in place</div><div style="font-size:11px;color:#3a5520;line-height:1.5;">25-year PPA with Tenaga Nasional confirmed. Reduces revenue risk and supports favourable rate positioning.</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Emerge Broker Contact</div></div>
+        <div class="row-item">
+          <div style="width:34px;height:34px;border-radius:50%;background:#f4c0d1;color:#72243E;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;">KL</div>
+          <div style="flex:1;"><div style="font-size:12px;font-weight:500;color:#1a1a1a;">Kevin Lim</div><div style="font-size:11px;color:#888;">Account Director</div><div style="font-size:11px;color:var(--ep);">kevin@emerge.com.my</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── QUOTE BUILDER ── -->
+<div class="scr" id="s-quote">
+  <div class="pg-hd"><div class="pg-t">Quote Builder</div><div class="pg-s">SUB-2026-0441 · Bukit Selambau LSS5 Solar — EAR/CAR</div></div>
+  <div class="grid-2 g2-5">
+    <div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Section I — Material Damage</div></div>
+        <div class="qb-row"><div><div class="qb-label">Sum Insured</div><div class="qb-sub">Contract value + existing structures</div></div><input class="qb-input" value="MYR 1,000,000,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">Rate on Line (%)</div><div class="qb-sub">Basis: market EML rate</div></div><input class="qb-input" value="0.184%"/></div>
+        <div class="qb-row"><div><div class="qb-label">Minimum Deductible (MD)</div><div class="qb-sub">Per occurrence</div></div><input class="qb-input" value="MYR 500,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">Flood Deductible</div><div class="qb-sub">Per occurrence</div></div><input class="qb-input" value="MYR 2,000,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">ALOP / DSU Period</div><div class="qb-sub">Advance Loss of Profits</div></div><input class="qb-input" value="12 months"/></div>
+        <div class="qb-total"><span class="qbt-l">Section I Premium (100%)</span><span class="qbt-v">MYR 1,840,000</span></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Section II — Third Party Liability</div></div>
+        <div class="qb-row"><div><div class="qb-label">Limit Any One Event</div></div><input class="qb-input" value="MYR 50,000,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">Annual Aggregate</div></div><input class="qb-input" value="MYR 100,000,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">TPL Deductible</div></div><input class="qb-input" value="MYR 100,000"/></div>
+        <div class="qb-row"><div><div class="qb-label">TPL Rate</div></div><input class="qb-input" value="0.022%"/></div>
+        <div class="qb-total"><span class="qbt-l">Section II Premium (100%)</span><span class="qbt-v">MYR 220,000</span></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Line &amp; Participation</div></div>
+        <div class="qb-row"><div><div class="qb-label">Your Line (%)</div><div class="qb-sub">As lead underwriter</div></div><input class="qb-input" value="40%"/></div>
+        <div class="qb-row"><div><div class="qb-label">Your Premium Share</div></div><input class="qb-input" value="MYR 736,000" style="color:var(--ep);font-weight:600;"/></div>
+        <div class="qb-row"><div><div class="qb-label">Brokerage (%)</div></div><input class="qb-input" value="15%"/></div>
+        <div class="qb-row"><div><div class="qb-label">Net Premium to You</div></div><input class="qb-input" value="MYR 625,600" style="color:var(--ep);font-weight:600;"/></div>
+        <div class="qb-total"><span class="qbt-l">Total Premium (100%)</span><span class="qbt-v">MYR 2,060,000</span></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-p" style="flex:1;padding:11px;">Issue Quote to Emerge →</button>
+        <button class="btn-s" style="padding:11px 18px;">Save Draft</button>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Quote Summary</div></div>
+        <div style="padding:14px 16px;">
+          <div class="kv"><span class="kv-k">Risk</span><span class="kv-v">Bukit Selambau LSS5</span></div>
+          <div class="kv"><span class="kv-k">Class</span><span class="kv-v">EAR / CAR</span></div>
+          <div class="kv"><span class="kv-k">Total SI</span><span class="kv-v">MYR 1,050,000,000</span></div>
+          <div class="kv"><span class="kv-k">Total Premium (100%)</span><span class="kv-v" style="color:var(--ep);font-weight:600;">MYR 2,060,000</span></div>
+          <div class="kv"><span class="kv-k">Your Line</span><span class="kv-v">40% lead</span></div>
+          <div class="kv"><span class="kv-k">Your Net Premium</span><span class="kv-v" style="color:var(--ep);font-weight:600;">MYR 625,600</span></div>
+          <div class="kv"><span class="kv-k">Quote Valid</span><span class="kv-v">30 days</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Conditions &amp; Warranties</div></div>
+        <div style="padding:12px 16px;display:flex;flex-direction:column;gap:7px;font-size:12px;color:#444;line-height:1.6;">
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--ep);font-weight:700;flex-shrink:0;">W1</span><span>Flood plinth height minimum 0.6m above 1:100 year flood level — survey to be provided within 30 days of inception</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--ep);font-weight:700;flex-shrink:0;">W2</span><span>Both JV entities (Solarvest Holdings + Atlantic Blue) to be named co-insureds on policy schedule</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:var(--ep);font-weight:700;flex-shrink:0;">W3</span><span>Site security and access control procedures to Munich Re minimum standards throughout construction period</span></div>
+          <div style="display:flex;gap:8px;align-items:flex-start;"><span style="color:#3B6D11;font-weight:700;flex-shrink:0;">C1</span><span>Monthly progress reports to broker. Milestone inspections at 25%, 50%, 75% completion.</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Wording</div></div>
+        <div style="padding:12px 16px;">
+          <div style="font-size:12px;color:#333;margin-bottom:8px;">Munich Re EAR Policy Wording v2.1 (2024) with Emerge endorsements:</div>
+          <div class="tag-row">
+            <span class="tag">Solar PV Endorsement</span>
+            <span class="tag">ALOP Extension</span>
+            <span class="tag">Flood Sub-limit</span>
+            <span class="tag ep">Terrorism Exclusion</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MARKET PANEL ── -->
+<div class="scr" id="s-market">
+  <div class="pg-hd"><div class="pg-t">Market Panel</div><div class="pg-s">Placement syndication — SUB-2026-0441 · Bukit Selambau LSS5</div></div>
+  <div class="grid-4">
+    <div class="sc em"><div class="sc-lbl">Total SI</div><div class="sc-val">MYR 1B</div><div class="sc-sub">100% of programme</div></div>
+    <div class="sc"><div class="sc-lbl">Placed</div><div class="sc-val">65%</div><div class="sc-sub">MYR 650M</div></div>
+    <div class="sc"><div class="sc-lbl">Outstanding</div><div class="sc-val">35%</div><div class="sc-sub">MYR 350M to place</div></div>
+    <div class="sc"><div class="sc-lbl">Markets Approached</div><div class="sc-val">6</div><div class="sc-sub">3 confirmed</div></div>
+  </div>
+
+  <div style="margin-bottom:6px;">
+    <div style="height:10px;background:#f0ebe4;border-radius:5px;overflow:hidden;display:flex;">
+      <div style="width:40%;background:var(--ep);"></div>
+      <div style="width:15%;background:#3B6D11;"></div>
+      <div style="width:10%;background:#185FA5;"></div>
+      <div style="width:35%;background:#e0dbd4;"></div>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:#888;">
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--ep);display:inline-block;"></span>Munich Re 40%</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#3B6D11;display:inline-block;"></span>Swiss Re 15%</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#185FA5;display:inline-block;"></span>Hannover Re 10%</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:#e0dbd4;display:inline-block;"></span>To be placed 35%</span>
+    </div>
+  </div>
+
+  <div class="grid-2 g2-7" style="margin-top:14px;">
+    <div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Participating Markets</div><button class="btn-p" style="font-size:11px;padding:4px 10px;">+ Add Market</button></div>
+        <div class="mkt-row">
+          <div class="mkt-logo ml-mre">MRe</div>
+          <div class="mkt-info"><div class="mkt-name">Munich Re</div><div class="mkt-cap">Lead · EAR specialist capacity</div></div>
+          <div class="mkt-share"><div class="mkt-share-v">40%</div><div class="mkt-share-l">MYR 400M</div></div>
+          <span class="bdg bdg-dark" style="margin-left:10px;">Lead</span>
+          <span class="bdg bdg-g" style="margin-left:6px;">Confirmed</span>
+        </div>
+        <div class="mkt-row">
+          <div class="mkt-logo ml-sre">SRe</div>
+          <div class="mkt-info"><div class="mkt-name">Swiss Re</div><div class="mkt-cap">Following · Renewable energy panel</div></div>
+          <div class="mkt-share"><div class="mkt-share-v">15%</div><div class="mkt-share-l">MYR 150M</div></div>
+          <span class="bdg bdg-g" style="margin-left:auto;">Confirmed</span>
+        </div>
+        <div class="mkt-row">
+          <div class="mkt-logo ml-han">HRe</div>
+          <div class="mkt-info"><div class="mkt-name">Hannover Re</div><div class="mkt-cap">Following · Engineering treaty</div></div>
+          <div class="mkt-share"><div class="mkt-share-v">10%</div><div class="mkt-share-l">MYR 100M</div></div>
+          <span class="bdg bdg-g" style="margin-left:auto;">Confirmed</span>
+        </div>
+        <div class="mkt-row">
+          <div class="mkt-logo ml-axi">AXL</div>
+          <div class="mkt-info"><div class="mkt-name">AXA XL</div><div class="mkt-cap">Following · Approached 14 Apr</div></div>
+          <div class="mkt-share"><div class="mkt-share-v">15%</div><div class="mkt-share-l">MYR 150M</div></div>
+          <span class="bdg bdg-a" style="margin-left:auto;">Pending</span>
+        </div>
+        <div class="mkt-row">
+          <div class="mkt-logo ml-qbe">QBE</div>
+          <div class="mkt-info"><div class="mkt-name">QBE Insurance</div><div class="mkt-cap">Following · Approached 14 Apr</div></div>
+          <div class="mkt-share"><div class="mkt-share-v">10%</div><div class="mkt-share-l">MYR 100M</div></div>
+          <span class="bdg bdg-a" style="margin-left:auto;">Pending</span>
+        </div>
+        <div style="padding:10px 16px;background:#faf8f5;border-top:0.5px solid #e8e3dc;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:12px;color:#888;">35% remaining · MYR 350M to place</span>
+          <button class="btn-p" style="font-size:11px;padding:4px 10px;">Chase Pending →</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Placement Status</div></div>
+        <div style="padding:14px 16px;">
+          <div class="kv"><span class="kv-k">Programme Size</span><span class="kv-v">MYR 1,000,000,000</span></div>
+          <div class="kv"><span class="kv-k">Placed to Date</span><span class="kv-v" style="color:#3B6D11;font-weight:600;">MYR 650,000,000 (65%)</span></div>
+          <div class="kv"><span class="kv-k">Outstanding</span><span class="kv-v" style="color:#854F0B;font-weight:600;">MYR 350,000,000 (35%)</span></div>
+          <div class="kv"><span class="kv-k">Total Premium (100%)</span><span class="kv-v">MYR 2,060,000</span></div>
+          <div class="kv"><span class="kv-k">Brokerage</span><span class="kv-v">15% — MYR 309,000</span></div>
+          <div class="kv"><span class="kv-k">Target Bind Date</span><span class="kv-v">25 Apr 2026</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-t">Slip &amp; Authorisation</div></div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:12px;color:#444;line-height:1.6;margin-bottom:12px;">Market Slip prepared by Emerge Insurance Brokers. All participating markets to sign and return via RiskDesk portal.</div>
+          <div class="doc-row" style="padding:8px 0;border-bottom:0.5px solid #f0ebe4;"><div class="doc-ic di-pdf" style="width:26px;height:26px;font-size:10px;">PDF</div><div style="flex:1;margin-left:8px;"><div class="doc-name" style="font-size:11px;">Market Slip — LSS5 Bukit Selambau</div><div class="doc-meta">Ready for signature</div></div><div class="td-act">Sign →</div></div>
+          <div class="doc-row" style="padding:8px 0;border:none;"><div class="doc-ic di-pdf" style="width:26px;height:26px;font-size:10px;">PDF</div><div style="flex:1;margin-left:8px;"><div class="doc-name" style="font-size:11px;">Cover Note (Draft)</div><div class="doc-meta">Pending full placement</div></div><div class="td-act" style="color:#aaa;">Draft</div></div>
+          <button class="btn-p" style="width:100%;padding:9px;margin-top:8px;font-size:12px;">Download Slip Package →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<script>
+function go(scr,navEl){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('act'));
+  document.querySelectorAll('.tt').forEach(t=>t.classList.remove('act'));
+  document.querySelectorAll('.sni').forEach(n=>n.classList.remove('act'));
+  var el=document.getElementById('s-'+scr);
+  if(el) el.classList.add('act');
+  document.querySelectorAll('.tt').forEach(t=>{
+    if(t.getAttribute('onclick')&&t.getAttribute('onclick').includes("'"+scr+"'")) t.classList.add('act');
+  });
+  if(navEl) navEl.classList.add('act');
+  else{
+    document.querySelectorAll('.sni').forEach(n=>{
+      if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+scr+"'")) n.classList.add('act');
+    });
+  }
+}
+</script>
+</body>
+</html>
